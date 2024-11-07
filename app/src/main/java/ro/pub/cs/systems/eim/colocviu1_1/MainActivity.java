@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -45,11 +46,27 @@ public class MainActivity extends AppCompatActivity {
         buttonSouth.setOnClickListener(view -> appendDirection("Sud"));
         buttonWest.setOnClickListener(view -> appendDirection("Vest"));
 
-        // Butonul pentru a lansa o nouă activitate
+        // Butonul pentru a lansa o nouă activitate cu resetare
+        Button buttonResetAndInvoke = findViewById(R.id.button_reset_and_invoke);
+        buttonResetAndInvoke.setOnClickListener(view -> {
+            // Resetează valorile
+            directionCount = 0;
+            directions = new StringBuilder();
+            updateLabelText(); // Actualizează textul afișat pentru a reflecta resetarea
+
+            // Lansează SecondActivity
+            Intent intent = new Intent(MainActivity.this, SecondActivity.class);
+            intent.putExtra(SecondActivity.EXTRA_INSTRUCTIONS, "Acestea sunt instrucțiunile curente după resetare");
+            startActivityForResult(intent, 1);
+        });
+
+        // Butonul pentru a lansa a doua activitate fără resetare
         Button buttonNextActivity = findViewById(R.id.button_next_activity);
         buttonNextActivity.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this, SecondActivity.class);
-            startActivity(intent);
+            // Trimite instrucțiunile curente
+            intent.putExtra(SecondActivity.EXTRA_INSTRUCTIONS, "Acestea sunt instrucțiunile curente");
+            startActivityForResult(intent, 1);
         });
     }
 
@@ -83,5 +100,17 @@ public class MainActivity extends AppCompatActivity {
         directionCount = savedInstanceState.getInt(KEY_DIRECTION_COUNT, 0);
         directions = new StringBuilder(savedInstanceState.getString(KEY_DIRECTIONS, ""));
         updateLabelText();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
+            // Obține ce buton a fost apăsat din SecondActivity
+            String buttonClicked = data.getStringExtra("button_clicked");
+            if (buttonClicked != null) {
+                Toast.makeText(this, "Butonul apăsat: " + buttonClicked, Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

@@ -54,4 +54,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:text="Lansează Activitate Nouă" />
+
+    <Button
+        android:id="@+id/button_reset_and_invoke"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reset și Invocă Activitate"
+        android:layout_marginTop="20dp" />
 </LinearLayout>
