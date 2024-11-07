@@ -40,32 +40,31 @@ public class MainActivity extends AppCompatActivity {
         Button buttonSouth = findViewById(R.id.button_south);
         Button buttonWest = findViewById(R.id.button_west);
 
-        // Setează listener pentru fiecare buton
-        buttonNorth.setOnClickListener(view -> appendDirection("Nord"));
-        buttonEast.setOnClickListener(view -> appendDirection("Est"));
-        buttonSouth.setOnClickListener(view -> appendDirection("Sud"));
-        buttonWest.setOnClickListener(view -> appendDirection("Vest"));
-
-        // Butonul pentru a lansa o nouă activitate cu resetare
-        Button buttonResetAndInvoke = findViewById(R.id.button_reset_and_invoke);
-        buttonResetAndInvoke.setOnClickListener(view -> {
-            // Resetează valorile
-            directionCount = 0;
-            directions = new StringBuilder();
-            updateLabelText(); // Actualizează textul afișat pentru a reflecta resetarea
-
-            // Lansează SecondActivity
-            Intent intent = new Intent(MainActivity.this, SecondActivity.class);
-            intent.putExtra(SecondActivity.EXTRA_INSTRUCTIONS, "Acestea sunt instrucțiunile curente după resetare");
-            startActivityForResult(intent, 1);
+        // Setează listener pentru fiecare buton, invocând SecondActivity după fiecare apăsare
+        buttonNorth.setOnClickListener(view -> {
+            appendDirection("Nord");
+            openSecondActivityWithHistory();
+        });
+        buttonEast.setOnClickListener(view -> {
+            appendDirection("Est");
+            openSecondActivityWithHistory();
+        });
+        buttonSouth.setOnClickListener(view -> {
+            appendDirection("Sud");
+            openSecondActivityWithHistory();
+        });
+        buttonWest.setOnClickListener(view -> {
+            appendDirection("Vest");
+            openSecondActivityWithHistory();
         });
 
         // Butonul pentru a lansa a doua activitate fără resetare
         Button buttonNextActivity = findViewById(R.id.button_next_activity);
         buttonNextActivity.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this, SecondActivity.class);
-            // Trimite instrucțiunile curente
+            // Trimite instrucțiunile curente și istoricul direcțiilor
             intent.putExtra(SecondActivity.EXTRA_INSTRUCTIONS, "Acestea sunt instrucțiunile curente");
+            intent.putExtra("direction_history", directions.toString()); // Trimite istoricul direcțiilor
             startActivityForResult(intent, 1);
         });
     }
@@ -83,6 +82,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateLabelText() {
         labelText.setText("Direcții apăsate: " + directions.toString() + " (" + directionCount + " apăsări)");
+    }
+
+    private void openSecondActivityWithHistory() {
+        Intent intent = new Intent(MainActivity.this, SecondActivity.class);
+        intent.putExtra(SecondActivity.EXTRA_INSTRUCTIONS, "Acestea sunt instrucțiunile curente");
+        intent.putExtra("direction_history", directions.toString()); // Trimite istoricul direcțiilor
+        startActivity(intent);
     }
 
     @Override
@@ -110,6 +116,14 @@ public class MainActivity extends AppCompatActivity {
             String buttonClicked = data.getStringExtra("button_clicked");
             if (buttonClicked != null) {
                 Toast.makeText(this, "Butonul apăsat: " + buttonClicked, Toast.LENGTH_SHORT).show();
+            }
+
+            // Obține instrucțiunile noi și afișează-le
+            String newInstructions = data.getStringExtra("new_instructions");
+            if (newInstructions != null && !newInstructions.isEmpty()) {
+                Toast.makeText(this, "Instrucțiuni noi: " + newInstructions, Toast.LENGTH_LONG).show();
+                // Sau poți afișa instrucțiunile într-un TextView, dacă vrei
+                labelText.setText("Instrucțiuni noi: " + newInstructions);
             }
         }
     }
